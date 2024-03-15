@@ -12,7 +12,7 @@ import {
 
 // HTTP connection to the GraphQL API
 const httpLink = new HttpLink({
-  uri: 'http://localhost:5000/graphql', // Your GraphQL endpoint
+  uri: 'http://localhost:5000/graphql',
 });
 
 // Create a custom ApolloLink middleware to set the authorization header
@@ -21,7 +21,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
-      authorization: 'apollo-starter-kit', // Set your authorization token here
+      authorization: 'apollo-starter-kit',
     },
   }));
 
@@ -45,22 +45,24 @@ const GET_ALL_JETS = gql`
       wingspan
       numberOfEngines
       manufacturingYear
-      createdAt
-      updatedAt
     }
   }
 `;
 
-const JetTable = () => {
-  // const { loading, error, data } = useQuery(GET_ALL_JETS, { client });
+export default function Home() {
+  const [selectedJets, setSelectedJets] = useState([]);
+  return (
+    <main>
+      <JetTable selectedJets={selectedJets} setSelectedJets={setSelectedJets} />
+      <CompareJets
+        selectedJets={selectedJets}
+        setSelectedJets={setSelectedJets}
+      />
+    </main>
+  );
+}
 
-  // if (loading) return <p>Loading...</p>;
-  // if (error) {
-  //   console.error('GraphQL Query Error:', error);
-  //   return <p>Error :(</p>;
-  // }
-  // if (!data) return null;
-
+const JetTable = ({ selectedJets, setSelectedJets }) => {
   const [jets, setJets] = useState([]);
   const [getJets, { called, loading, data, error }] = useLazyQuery(
     GET_ALL_JETS,
@@ -80,6 +82,21 @@ const JetTable = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    jetId: number
+  ) => {
+    if (e.target.checked) {
+      // Add jet ID to the selectedJets array if it's not already included
+      setSelectedJets((prevSelected) => [...prevSelected, jetId]);
+    } else {
+      // Remove the jet ID from the selectedJets array
+      setSelectedJets((prevSelected) =>
+        prevSelected.filter((id) => id !== jetId)
+      );
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <h1 className="text-xl font-bold mb-4">Top 10 Charter Jets</h1>
@@ -88,6 +105,9 @@ const JetTable = () => {
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Select
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Id
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Name
@@ -101,20 +121,22 @@ const JetTable = () => {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Manufacturing Year
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Created At
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Updated At
-            </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {jets.map((jet: any) => (
             <tr key={jet.id}>
               <td className="px-6 py-4 whitespace-nowrap">
-                <input type="checkbox" className="rounded" />
+                <input
+                  type="checkbox"
+                  className="rounded"
+                  checked={selectedJets.some(
+                    (selectedJet) => selectedJet.id === jet.id
+                  )}
+                  onChange={(e) => handleCheckboxChange(e, jet)}
+                />
               </td>
+              <td className="px-6 py-4 whitespace-nowrap">{jet.id}</td>
               <td className="px-6 py-4 whitespace-nowrap">{jet.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">{jet.wingspan}</td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -123,8 +145,6 @@ const JetTable = () => {
               <td className="px-6 py-4 whitespace-nowrap">
                 {jet.manufacturingYear}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">{jet.createdAt}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{jet.updatedAt}</td>
             </tr>
           ))}
         </tbody>
@@ -133,10 +153,94 @@ const JetTable = () => {
   );
 };
 
-export default function Home() {
+const CompareJets = ({ selectedJets, setSelectedJets }) => {
+  const [comparisonCategory, setComparisonCategory] = useState('top_speed');
+  const [rankings, setRankings] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleCompare = async () => {
+    setLoading(true);
+    try {
+      // Assuming selectedJets is available in this scope
+      const response = await fetch('http://localhost:8000/api/compare_jets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          comparisonCategory,
+          jets: selectedJets,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setRankings(data);
+    } catch (error) {
+      console.error('Failed to compare jets:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <main>
-      <JetTable />
-    </main>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">
+        Ask OpenAI to Compare Selected Jets By:{' '}
+      </h1>
+      <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
+        <select
+          className="block w-full md:w-auto px-4 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+          value={comparisonCategory}
+          onChange={(e) => setComparisonCategory(e.target.value)}
+        >
+          <option value="top_speed">Top Speed (mph)</option>
+          <option value="fuel_efficiency">Fuel Efficiency (mpg)</option>
+          <option value="maximum_seats">Maximum Seats</option>
+        </select>
+        <button
+          className={`px-4 py-2 font-semibold text-white bg-blue-500 rounded-md ${
+            loading ? 'bg-blue-300' : 'hover:bg-blue-700'
+          } focus:outline-none disabled:opacity-50`}
+          onClick={handleCompare}
+          disabled={loading}
+        >
+          {loading ? 'Comparing...' : 'Compare Selected Jets'}
+        </button>
+      </div>
+      {rankings?.length > 0 && (
+        <table className="min-w-full leading-normal">
+          <thead>
+            <tr>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Rank
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Value
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rankings.map((ranking, index) => (
+              <tr key={index}>
+                <td className="px-5 py-2 border-b border-gray-200 bg-white text-sm">
+                  {ranking.Rank}
+                </td>
+                <td className="px-5 py-2 border-b border-gray-200 bg-white text-sm">
+                  {ranking.Name}
+                </td>
+                <td className="px-5 py-2 border-b border-gray-200 bg-white text-sm">
+                  {ranking.Value}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
-}
+};
