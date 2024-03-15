@@ -1,6 +1,5 @@
-import { gql } from 'apollo-server-express';
 import { GraphQLScalarType, Kind } from 'graphql';
-import * as db_ops from './jet_queries_mutations';
+import * as db_ops from '../db_ops/jet_queries_mutations';
 
 const dateTimeScalar = new GraphQLScalarType({
   name: 'DateTime',
@@ -40,44 +39,6 @@ const dateTimeScalar = new GraphQLScalarType({
     return null;
   },
 });
-
-export const typeDefs = gql`
-  type Query {
-    GetAllJets: [Jet]
-    GetJetById(id: ID!): Jet
-  }
-
-  type Mutation {
-    InsertJet(
-      name: String
-      wingspan: Float
-      numberOfEngines: Int
-      manufacturingYear: Int
-    ): Jet
-
-    UpdateJet(
-      id: ID!
-      name: String
-      wingspan: Float
-      numberOfEngines: Int
-      manufacturingYear: Int
-    ): Jet
-
-    DeleteJet(id: ID!): Jet
-  }
-
-  type Jet {
-    id: ID!
-    name: String
-    wingspan: Float
-    numberOfEngines: Int
-    manufacturingYear: Int
-    createdAt: DateTime
-    updatedAt: DateTime
-  }
-
-  scalar DateTime
-`;
 
 export const resolvers = {
   Query: {

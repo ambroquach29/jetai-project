@@ -1,7 +1,6 @@
-import { query, mutate } from './graphql';
+import { query, mutate } from '../helpers/graphql';
 import * as gql_strings from './hasura_ops';
 import dotenv from 'dotenv';
-import { GraphQLError } from 'graphql';
 dotenv.config();
 
 /***********************************

@@ -6,11 +6,10 @@ import http from 'http';
 import cors from 'cors';
 import express from 'express';
 import compression from 'compression';
-import { authorization } from './auth';
+import { authorization } from './helpers/auth';
 import * as _ from 'lodash';
-import { typeDefs, resolvers } from './schema';
-// import typeDefs from "./schema/schema";
-// import { resolvers } from "./resolvers/resolvers";
+import { typeDefs } from './schema/schema';
+import { resolvers } from './resolvers/resolvers';
 
 async function startApolloServer() {
   const PORT = process.env.PORT || 5000;
