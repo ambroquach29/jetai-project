@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-openai_api_key = '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'
+openai_api_key = 'openai_api_key_here'
 # Initialize the OpenAI LLM with your API key
 llm = OpenAI(api_key=openai_api_key)
 
