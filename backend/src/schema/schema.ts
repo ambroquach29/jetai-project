@@ -14,6 +14,8 @@ export const typeDefs = gql`
       manufacturingYear: Int
     ): Jet
 
+    InsertJets: [Jet]
+
     UpdateJet(
       id: ID!
       name: String

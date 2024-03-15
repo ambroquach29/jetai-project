@@ -58,6 +58,10 @@ export const resolvers = {
       const resolved = await db_ops.insertJet(args);
       return resolved;
     },
+    InsertJets: async (_: any, args: any) => {
+      const resolved = await db_ops.insertJets();
+      return resolved;
+    },
     UpdateJet: async (_: any, args: any) => {
       const resolved = await db_ops.updateJetById(args);
       console.log(resolved);

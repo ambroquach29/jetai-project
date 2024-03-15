@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Gulfstream G650",
+    "wingspan": "99.7",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2012"
+  },
+  {
+    "name": "Bombardier Global 7500",
+    "wingspan": "104",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2018"
+  },
+  {
+    "name": "Cessna Citation Longitude",
+    "wingspan": "68.5",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2017"
+  },
+  {
+    "name": "Embraer Phenom 300",
+    "wingspan": "53.2",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2009"
+  },
+  {
+    "name": "Dassault Falcon 7X",
+    "wingspan": "86",
+    "numberOfEngines": "3",
+    "manufacturingYear": "2005"
+  },
+  {
+    "name": "Bombardier Challenger 350",
+    "wingspan": "69",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2014"
+  },
+  {
+    "name": "Gulfstream G280",
+    "wingspan": "63",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2011"
+  },
+  {
+    "name": "HondaJet Elite",
+    "wingspan": "39.8",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2018"
+  },
+  {
+    "name": "Pilatus PC-24",
+    "wingspan": "55.8",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2017"
+  },
+  {
+    "name": "Learjet 75 Liberty",
+    "wingspan": "50.9",
+    "numberOfEngines": "2",
+    "manufacturingYear": "2020"
+  }
+]

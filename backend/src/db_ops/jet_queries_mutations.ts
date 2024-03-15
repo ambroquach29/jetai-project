@@ -1,7 +1,17 @@
 import { query, mutate } from '../helpers/graphql';
 import * as gql_strings from './hasura_ops';
+import { readFile } from 'fs/promises';
+import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
+
+/** This function read and parse json file */
+const readParseJsonFile = async () => {
+  const filePath = path.join(__dirname, '..', '..', 'jet_facts.json');
+  const fileContents = await readFile(filePath, { encoding: 'utf8' });
+  const data = JSON.parse(fileContents);
+  return data;
+};
 
 /***********************************
     CRUD operations for JETS
@@ -34,9 +44,17 @@ export const insertJet = async (args: any) => {
   return result.data.insert_Jet_one;
 };
 
+/** This function inserts multiple Jets into the database. */
+export const insertJets = async () => {
+  const jets = await readParseJsonFile();
+  const result = await mutate(gql_strings.INSERT_JETS, {
+    objects: jets,
+  });
+  return result.data.insert_Jet.returning;
+};
+
 /** This function updates an existing Jet in the database. */
 export const updateJetById = async (args: any) => {
-  console.log(args);
   const result = await mutate(gql_strings.UPDATE_JET_BY_ID, {
     id: args.id,
     changes: {

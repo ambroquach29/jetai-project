@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-openai_api_key = 'openai_api_key_here'
+openai_api_key = 'YOUR_API_KEY'
 # Initialize the OpenAI LLM with your API key
 llm = OpenAI(api_key=openai_api_key)
 
@@ -38,7 +38,6 @@ async def compare_jets(request: CompareJetsRequest):
     ranked_table = [
         {"Rank": i + 1, "Name": jet["name"], "Value": jet[comparison_category]} for i, jet in enumerate(sorted_jets)
     ]
-    print(ranked_table)
     return ranked_table
   
   ranked_table = rank_jets(rankings, data["comparisonCategory"])
@@ -56,8 +55,6 @@ def process_jets(comparison_category, jets_data):
 
         comprehensive_prompt = "\n".join(prompt_parts)
         response = llm(comprehensive_prompt)
-        print(response)
-        print((parse_llm_response(comparison_category, response))[0])
         jet[comparison_category] = (parse_llm_response(comparison_category, response))[0]
       return jets_data
   
@@ -65,12 +62,11 @@ def process_jets(comparison_category, jets_data):
 
   return jets_data
 
-
 def parse_llm_response(attribute, input_str):
     # Regular expressions for each type of input
     patterns = {
-        'top_speed': r'(\d+(\.\d+)?)\s*mph\.',
-        'fuel_efficiency': r'(\d+(\.\d+)?)\s*mpg\.',
+        'top_speed': r'(\d+(\.\d+)?)\s*mph',
+        'fuel_efficiency': r'(\d+(\.\d+)?)\s*mpg',
         'maximum_seats': r'(\d+)\s*seats?\.'
     }
     
@@ -83,7 +79,7 @@ def parse_llm_response(attribute, input_str):
     if match:
         # Convert to float if it's a top speed or fuel efficiency, int if maximum seats
         if attribute in ['top_speed']:
-            return int(match.group(1)), "Success"
+            return float(match.group(1)), "Success"
         elif attribute in ['fuel_efficiency']:
             return float(match.group(1)), "Success"
         elif attribute == 'maximum_seats':

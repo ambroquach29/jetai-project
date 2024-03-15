@@ -32,6 +32,16 @@ mutation InsertJet($input: Jet_insert_input!) {
 }
 `;
 
+export const INSERT_JETS = `
+mutation InsertJets($objects: [Jet_insert_input!]!) {
+  insert_Jet(objects: $objects) {
+    returning {
+      ${JET_FIELDS}
+    }
+  }
+}
+`;
+
 export const UPDATE_JET_BY_ID = `
 mutation UpdateJetById($id: Int!, $changes: Jet_set_input!) {
   update_Jet(
